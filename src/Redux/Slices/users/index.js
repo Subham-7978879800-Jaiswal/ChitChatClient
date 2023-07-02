@@ -4,6 +4,7 @@ const initialState = {
   // Define your initial state here
   user: {},
   otherUsers: [],
+  chats:[]
 };
 
 const userSlice = createSlice({
@@ -16,10 +17,13 @@ const userSlice = createSlice({
     setOtherUsers(state, action) {
       state.otherUsers = action.payload;
     },
+    setAllChats(state, action) {
+       state.chats = action.payload;
+    },
   },
 });
 
-const { setUser, setOtherUsers } = userSlice.actions;
+const { setUser, setOtherUsers, setAllChats } = userSlice.actions;
 const userReducer = userSlice.reducer;
 
-export { userReducer, setUser, setOtherUsers };
+export { userReducer, setUser, setOtherUsers, setAllChats };

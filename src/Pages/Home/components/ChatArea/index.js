@@ -133,7 +133,7 @@ function ChatArea({ socket }) {
 
         <div className="flex gap-2 text-xl">
           <label for="file">
-            <i class="ri-link cursor-pointer text-xl" typeof="file"></i>
+            <i className="ri-link cursor-pointer text-xl" typeof="file"></i>
             <input
               type="file"
               id="file"
@@ -145,7 +145,7 @@ function ChatArea({ socket }) {
             />
           </label>
           <i
-            class="ri-emotion-line cursor-pointer text-xl"
+            className="ri-emotion-line cursor-pointer text-xl"
             onClick={() => setShowEmojiPicker(!showEmojiPicker)}
           ></i>
         </div>

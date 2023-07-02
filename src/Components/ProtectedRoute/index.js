@@ -3,7 +3,7 @@ import React, { useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { Toaster, toast } from "react-hot-toast";
 import { useDispatch, useSelector } from "react-redux";
-import { setUser, setOtherUsers } from "../../Redux/Slices/users";
+import { setUser, setOtherUsers, setAllChats } from "../../Redux/Slices/users";
 import axios from "axios";
 import ShieldUserFillIcon from "remixicon-react/ShieldUserFillIcon";
 import LogoutBoxLineIcon from "remixicon-react/LogoutBoxLineIcon";
@@ -40,10 +40,21 @@ const ProtectedRoute = (props) => {
     }
   };
 
+  const getAllChats = async () => {
+    try {
+      const chatUrl = `${REACT_APP_API_URL}/chat/get-all-chats`;
+      const response = await axios.get(chatUrl, { withCredentials: true });
+      dispatch(setAllChats(response.data.chats));
+    } catch (err) {
+      toast.error("Other users are  not available");
+    }
+  };
+
   useEffect(() => {
     (async () => {
       await getUser();
       await getOtherUsers();
+      await getAllChats();
     })();
   }, []);
 
