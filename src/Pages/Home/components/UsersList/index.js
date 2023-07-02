@@ -41,76 +41,82 @@ function UsersList({ searchKey, setSearchKey }) {
       setLoading(false);
     }
   };
+
+  const getUserToShowOnLeftPanel = (otherUsers) => {
+    return otherUsers?.filter(
+      (userObj) =>
+        (userObj?.name
+          ?.split(" ")
+          .join()
+          .toLowerCase()
+          .includes(searchKey?.toLowerCase()) &&
+          searchKey) ||
+        chats.filter((chat) =>
+          chat?.members.map((m) => m._id)?.includes(userObj._id)
+        ).length > 0
+    );
+  };
+
   return (
     <>
       <Toaster></Toaster>
       {loading && <Spinner></Spinner>}
-      {otherUsers
-        ?.filter(
-          (userObj) =>
-            (userObj?.name
-              ?.split(" ")
-              .join()
-              .toLowerCase()
-              .includes(searchKey?.toLowerCase()) &&
-              searchKey) ||
-            chats.filter((chat) => chat?.members?.includes(userObj._id)).length > 0
-        )
-        ?.map((userObj, index) => {
-          return (
-            <React.Fragment key={userObj?.name + index}>
-              <div className=" flex flex-col gap-3 mt-5">
-                {" "}
-                <div
-                  style={{
-                    padding: "7px",
-                    borderRadius: "7px",
-                    borderTopLeftRadius: "0px",
-                    boxShadow: "1px 1px 1px lightgrey",
-                  }}
-                  className="bg-[#fff] hover:bg-[#ddd] flex gap-5 items-center hover:bg-sky-700 "
-                >
-                  {userObj.profilePic && (
-                    <img
-                      src={userObj.profilePic}
-                      alt="profile pic"
-                      className="w-10 h-10 rounded-full"
-                    />
-                  )}
-                  {!userObj.profilePic && (
-                    <div className="bg-gray-400 rounded-full h-12 w-12 flex items-center justify-center relative">
-                      <h1 className="uppercase text-xl font-semibold text-white">
-                        {userObj.name[0]}
-                      </h1>
-                    </div>
-                  )}
-                  <div className="flex flex-col gap-">
-                    <div className="flex gap-1">
-                      <div className="relative flex gap-1 items-center ">
-                        <Highlighter
-                          highlightClassName="YourHighlightClass"
-                          searchWords={[`${searchKey}`]}
-                          autoEscape={true}
-                          textToHighlight={`${userObj?.name}`}
-                        />
-                      </div>
+      {getUserToShowOnLeftPanel(otherUsers)?.map((userObj, index) => {
+        return (
+          <React.Fragment key={userObj?.name + index}>
+            <div className=" flex flex-col gap-3 mt-5">
+              {" "}
+              <div
+                style={{
+                  padding: "7px",
+                  borderRadius: "7px",
+                  borderTopLeftRadius: "0px",
+                  boxShadow: "1px 1px 1px lightgrey",
+                }}
+                className="bg-[#fff] hover:bg-[#ddd] flex gap-5 items-center hover:bg-sky-700 "
+              >
+                {userObj.profilePic && (
+                  <img
+                    src={userObj.profilePic}
+                    alt="profile pic"
+                    className="w-10 h-10 rounded-full"
+                  />
+                )}
+                {!userObj.profilePic && (
+                  <div className="bg-gray-400 rounded-full h-12 w-12 flex items-center justify-center relative">
+                    <h1 className="uppercase text-xl font-semibold text-white">
+                      {userObj.name[0]}
+                    </h1>
+                  </div>
+                )}
+                <div className="flex flex-col gap-">
+                  <div className="flex gap-1">
+                    <div className="relative flex gap-1 items-center ">
+                      <Highlighter
+                        highlightClassName="YourHighlightClass"
+                        searchWords={[`${searchKey}`]}
+                        autoEscape={true}
+                        textToHighlight={`${userObj?.name}`}
+                      />
                     </div>
                   </div>
-                  {!chats.filter((chat) => chat?.members?.includes(userObj._id))
-                    .length > 0 && (
-                    <button
-                      id={userObj["_id"]}
-                      onClick={createChat}
-                      className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-1 px-2 rounded ml-auto"
-                    >
-                      Add To Chat
-                    </button>
-                  )}
                 </div>
+                {!chats.filter((chat) =>
+                  chat?.members.map((m) => m._id)?.includes(userObj._id)
+                ).length > 0 && (
+                  <button
+                    id={userObj["_id"]}
+                    onClick={createChat}
+                    className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-1 px-2 rounded ml-auto"
+                  >
+                    Add To Chat
+                  </button>
+                )}
               </div>
-            </React.Fragment>
-          );
-        })}
+            </div>
+          </React.Fragment>
+        );
+      })}
     </>
   );
 }
