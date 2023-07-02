@@ -1,8 +1,9 @@
-import React from "react";
+import React, { useState } from "react";
 import { useSelector } from "react-redux";
 
 function ChatArea({ socket }) {
   const user = useSelector((state) => state.user);
+  const [newMessage, setNewMessage] = useState("");
   const selectedChat = useSelector((state) => state.selectedChat);
   const receipentUser = selectedChat?.members?.find(
     (mem) => mem._id !== user._id
@@ -94,8 +95,8 @@ function ChatArea({ socket }) {
 
       {/* 3rd part chat input */}
 
-      {/* <div className="h-18 rounded-xl border-gray-300 shadow border flex justify-between p-2 items-center relative">
-        {showEmojiPicker && (
+      <div className="h-18 rounded-xl border-gray-300 shadow border flex justify-between p-2 items-center relative">
+        {/* {showEmojiPicker && (
           <div className="absolute -top-96 left-0">
             <EmojiPicker
               height={350}
@@ -104,7 +105,7 @@ function ChatArea({ socket }) {
               }}
             />
           </div>
-        )}
+        )} */}
 
         <div className="flex gap-2 text-xl">
           <label for="file">
@@ -121,7 +122,7 @@ function ChatArea({ socket }) {
           </label>
           <i
             className="ri-emotion-line cursor-pointer text-xl"
-            onClick={() => setShowEmojiPicker(!showEmojiPicker)}
+            // onClick={() => setShowEmojiPicker(!showEmojiPicker)}
           ></i>
         </div>
 
@@ -132,11 +133,6 @@ function ChatArea({ socket }) {
           value={newMessage}
           onChange={(e) => {
             setNewMessage(e.target.value);
-            socket.emit("typing", {
-              chat: selectedChat._id,
-              members: selectedChat.members.map((mem) => mem._id),
-              sender: user._id,
-            });
           }}
         />
         <button
@@ -145,7 +141,7 @@ function ChatArea({ socket }) {
         >
           <i className="ri-send-plane-2-line text-white"></i>
         </button>
-      </div> */}
+      </div>
     </div>
   );
 }
