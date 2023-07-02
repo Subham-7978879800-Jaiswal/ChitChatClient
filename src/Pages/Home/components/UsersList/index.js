@@ -3,8 +3,8 @@ import { useSelector, useDispatch } from "react-redux";
 import Highlighter from "react-highlight-words";
 import axios from "axios";
 import toast, { Toaster } from "react-hot-toast";
-import Spinner from "../../../../Components/Spinner";
-import { setAllChats } from "../../../../Redux/Slices/users";
+import Loader from "../../../../Components/Loader";
+import { setAllChats, setSelectedChat } from "../../../../Redux/Slices/users";
 
 function UsersList({ searchKey, setSearchKey }) {
   const otherUsers = useSelector((state) => state.otherUsers);
@@ -32,12 +32,12 @@ function UsersList({ searchKey, setSearchKey }) {
       const newChat = response.data.chat;
       const allChats = [...chats, newChat];
       dispatch(setAllChats(allChats));
+      dispatch(setSelectedChat(newChat));
       toast.success("Start By Saying Hii :) ");
     } catch (err) {
       const errMsg = err?.response?.data?.errorMessage;
       if (errMsg !== {}) toast.error(errMsg.toString());
     } finally {
-      setSearchKey("");
       setLoading(false);
     }
   };
@@ -57,14 +57,24 @@ function UsersList({ searchKey, setSearchKey }) {
     );
   };
 
+  const openNewChatWindowForSelectedUser = (userObj) => {
+    const currenChat = { ...userObj };
+    currenChat.members = [userObj];
+    dispatch(setSelectedChat(currenChat));
+  };
+
   return (
     <>
+      {loading && <Loader></Loader>}
       <Toaster></Toaster>
-      {loading && <Spinner></Spinner>}
+
       {getUserToShowOnLeftPanel(otherUsers)?.map((userObj, index) => {
         return (
           <React.Fragment key={userObj?.name + index}>
-            <div className=" flex flex-col gap-3 mt-5">
+            <div
+              onClick={() => openNewChatWindowForSelectedUser(userObj)}
+              className=" flex flex-col gap-3 mt-5"
+            >
               {" "}
               <div
                 style={{

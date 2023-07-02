@@ -71,7 +71,7 @@ const ProtectedRoute = (props) => {
     <>
       <Toaster />
 
-      <div className="h-screen w-screen bg-gray-100 p-2">
+      <div className="h-screen bg-gray-100 p-2">
         {/* header */}
         <div className="flex justify-between p-5 bg-primary rounded">
           <div className="flex items-center gap-1">

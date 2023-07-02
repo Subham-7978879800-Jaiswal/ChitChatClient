@@ -1,7 +1,6 @@
 import React, { useState } from "react";
-import { Link } from "react-router-dom";
-import { useNavigate } from "react-router-dom";
-import Spinner from "../../Components/Spinner";
+import { Link, useNavigate } from "react-router-dom";
+import Loader from "../../Components/Loader";
 import toast, { Toaster } from "react-hot-toast";
 import axios from "axios";
 
@@ -38,7 +37,7 @@ function Register() {
 
   return (
     <>
-      {loading && <Spinner></Spinner>}
+      {loading && <Loader></Loader>}
       <Toaster />
       <form onSubmit={handleRegister}>
         <div className="h-screen bg-primary flex items-center justify-center">

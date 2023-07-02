@@ -1,39 +1,14 @@
 import React from "react";
-import {  useSelector } from "react-redux";
-import moment from "moment";
-import EmojiPicker from "emoji-picker-react";
+import { useSelector } from "react-redux";
 
 function ChatArea({ socket }) {
-  const [showEmojiPicker, setShowEmojiPicker] = React.useState(false);
-  const [isReceipentTyping] = React.useState(false);
-  const [newMessage, setNewMessage] = React.useState("");
-  const { selectedChat, user } = useSelector((state) => state.userReducer);
-  const [messages = []] = React.useState([]);
-  const receipentUser = selectedChat.members.find(
+  const user = useSelector((state) => state.user);
+  const selectedChat = useSelector((state) => state.selectedChat);
+  const receipentUser = selectedChat?.members?.find(
     (mem) => mem._id !== user._id
   );
-
-  const getDateInRegualarFormat = (date) => {
-    let result = "";
-
-    // if date is today return time in hh:mm format
-    if (moment(date).isSame(moment(), "day")) {
-      result = moment(date).format("hh:mm");
-    }
-    // if date is yesterday return yesterday and time in hh:mm format
-    else if (moment(date).isSame(moment().subtract(1, "day"), "day")) {
-      result = `Yesterday ${moment(date).format("hh:mm")}`;
-    }
-    // if date is this year return date and time in MMM DD hh:mm format
-    else if (moment(date).isSame(moment(), "year")) {
-      result = moment(date).format("MMM DD hh:mm");
-    }
-
-    return result;
-  };
-
   return (
-    <div className="bg-white h-[82vh] border rounded-2xl w-full flex flex-col justify-between p-5">
+    <div className="bg-white h-[80vh] border rounded-2xl w-full flex flex-col justify-between p-5">
       {/* 1st part receipent user */}
       <div>
         <div className="flex gap-5 items-center mb-2">
@@ -57,7 +32,7 @@ function ChatArea({ socket }) {
       </div>
 
       {/* 2nd part chat messages */}
-      <div className="h-[55vh] overflow-y-scroll p-5" id="messages">
+      {/* <div className="h-[55vh] overflow-y-scroll p-5" id="messages">
         <div className="flex flex-col gap-2">
           {messages.map((message, index) => {
             const isCurrentUserIsSender = message.sender === user._id;
@@ -115,11 +90,11 @@ function ChatArea({ socket }) {
             </div>
           )}
         </div>
-      </div>
+      </div> */}
 
       {/* 3rd part chat input */}
 
-      <div className="h-18 rounded-xl border-gray-300 shadow border flex justify-between p-2 items-center relative">
+      {/* <div className="h-18 rounded-xl border-gray-300 shadow border flex justify-between p-2 items-center relative">
         {showEmojiPicker && (
           <div className="absolute -top-96 left-0">
             <EmojiPicker
@@ -170,7 +145,7 @@ function ChatArea({ socket }) {
         >
           <i className="ri-send-plane-2-line text-white"></i>
         </button>
-      </div>
+      </div> */}
     </div>
   );
 }

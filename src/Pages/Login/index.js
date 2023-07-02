@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import axios from "axios";
 import toast, { Toaster } from "react-hot-toast";
-import Spinner from "../../Components/Spinner";
+import Loader from "../../Components/Loader";
 
 function Login() {
   const [user, setUser] = React.useState({
@@ -45,7 +45,7 @@ function Login() {
   return (
     <>
       <Toaster />
-      {loading && <Spinner></Spinner>}
+      {loading && <Loader></Loader>}
       <form onSubmit={handleLogin}>
         <div className="h-screen bg-primary flex items-center justify-center">
           <div className="bg-white shadow-md p-5 flex flex-col gap-5 w-96">
