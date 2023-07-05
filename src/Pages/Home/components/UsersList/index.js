@@ -6,10 +6,11 @@ import toast, { Toaster } from "react-hot-toast";
 import Loader from "../../../../Components/Loader";
 import { setAllChats, setSelectedChat } from "../../../../Redux/Slices/users";
 
-function UsersList({ searchKey, setSearchKey }) {
+function UsersList({ searchKey, setSearchKey, setMessages }) {
   const otherUsers = useSelector((state) => state.otherUsers);
   const chats = useSelector((state) => state.chats);
   const user = useSelector((state) => state.user);
+  const [selectedUserId,setSelectedUserId] = useState("");
   const [loading, setLoading] = useState(false);
   const { REACT_APP_API_URL } = process.env;
   const dispatch = useDispatch();
@@ -17,7 +18,7 @@ function UsersList({ searchKey, setSearchKey }) {
     try {
       setLoading(true);
       const id = event.target.id;
-      const members = [id, user._id];
+      const members = [id, user?._id];
 
       const newChatBody = {
         members,
@@ -42,6 +43,28 @@ function UsersList({ searchKey, setSearchKey }) {
     }
   };
 
+  const getAllMessages = async (chatId) => {
+    try {
+      setLoading(true);
+
+      const messagesLinkedToChatId = {
+        chatId: chatId,
+      };
+
+      const response = await axios.post(
+        `${REACT_APP_API_URL}/messages/get-all-messages/`,
+        messagesLinkedToChatId,
+        { withCredentials: true }
+      );
+      return response.data.messages;
+    } catch (err) {
+      const errMsg = err?.response?.data?.errorMessage;
+      if (errMsg !== {}) toast.error(errMsg.toString());
+    } finally {
+      setLoading(false);
+    }
+  };
+
   const getUserToShowOnLeftPanel = (otherUsers) => {
     return otherUsers?.filter(
       (userObj) =>
@@ -52,15 +75,22 @@ function UsersList({ searchKey, setSearchKey }) {
           .includes(searchKey?.toLowerCase()) &&
           searchKey) ||
         chats.filter((chat) =>
-          chat?.members.map((m) => m._id)?.includes(userObj._id)
+          chat?.members.map((m) => m?._id)?.includes(userObj?._id)
         ).length > 0
     );
   };
 
-  const openNewChatWindowForSelectedUser = (userObj) => {
-    const currenChat = { ...userObj };
-    currenChat.members = [userObj];
-    dispatch(setSelectedChat(currenChat));
+  const openNewChatWindowForSelectedUser = async (userObj) => {
+
+  
+    const currentChat = { ...userObj };
+    currentChat.members = [userObj, user?._id];
+    currentChat.unreadMessages = 0;
+    currentChat._id = chats.filter(
+      (chat) => chat.members.filter((m) => m?._id === userObj?._id).length > 0
+    )[0]?._id;
+    dispatch(setSelectedChat(currentChat));
+    setMessages(await getAllMessages(currentChat?._id));
   };
 
   return (
@@ -72,8 +102,16 @@ function UsersList({ searchKey, setSearchKey }) {
         return (
           <React.Fragment key={userObj?.name + index}>
             <div
-              onClick={() => openNewChatWindowForSelectedUser(userObj)}
-              className=" flex flex-col gap-3 mt-5"
+              onClick={() => {
+                  if (userObj?._id === selectedUserId) {
+                    return;
+                  }
+                setSelectedUserId(userObj?._id);
+                openNewChatWindowForSelectedUser(userObj)
+              
+              }}
+              className="flex flex-col gap-3 mt-5"
+              style={{ boxShadow : userObj?._id === selectedUserId ? "2px 2px 2px grey": ""}}
             >
               {" "}
               <div
@@ -112,7 +150,7 @@ function UsersList({ searchKey, setSearchKey }) {
                   </div>
                 </div>
                 {!chats.filter((chat) =>
-                  chat?.members.map((m) => m._id)?.includes(userObj._id)
+                  chat?.members.map((m) => m?._id)?.includes(userObj?._id)
                 ).length > 0 && (
                   <button
                     id={userObj["_id"]}
