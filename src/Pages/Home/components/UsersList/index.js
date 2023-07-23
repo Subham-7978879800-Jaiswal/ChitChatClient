@@ -2,15 +2,17 @@ import React, { useState } from "react";
 import { useSelector, useDispatch } from "react-redux";
 import Highlighter from "react-highlight-words";
 import axios from "axios";
+import moment from "moment";
 import toast, { Toaster } from "react-hot-toast";
 import Loader from "../../../../Components/Loader";
 import { setAllChats, setSelectedChat } from "../../../../Redux/Slices/users";
+import { Badge } from "@material-tailwind/react";
 
 function UsersList({ searchKey, setSearchKey, setMessages }) {
   const otherUsers = useSelector((state) => state.otherUsers);
   const chats = useSelector((state) => state.chats);
   const user = useSelector((state) => state.user);
-  const [selectedUserId,setSelectedUserId] = useState("");
+  const [selectedUserId, setSelectedUserId] = useState("");
   const [loading, setLoading] = useState(false);
   const { REACT_APP_API_URL } = process.env;
   const dispatch = useDispatch();
@@ -65,6 +67,65 @@ function UsersList({ searchKey, setSearchKey, setMessages }) {
     }
   };
 
+  const getDateInRegualarFormat = (date) => {
+    let result = "";
+
+    // if date is today return time in hh:mm format
+    if (moment(date).isSame(moment(), "day")) {
+      result = moment(date).format("hh:mm");
+    }
+    // if date is yesterday return yesterday and time in hh:mm format
+    else if (moment(date).isSame(moment().subtract(1, "day"), "day")) {
+      result = `Yesterday ${moment(date).format("hh:mm")}`;
+    }
+    // if date is this year return date and time in MMM DD hh:mm format
+    else if (moment(date).isSame(moment(), "year")) {
+      result = moment(date).format("MMM DD hh:mm");
+    }
+
+    return result;
+  };
+
+  const getLastMsg = (userObj) => {
+    const chat = chats.find((chat) =>
+      chat.members.map((mem) => mem._id).includes(userObj._id)
+    );
+    if (!chat || !chat.lastMessage) {
+      return "";
+    } else {
+      const lastMsgPerson =
+        chat?.lastMessage?.senderId === user._id ? "You : " : "";
+      return (
+        <div className="flex justify-between w-72">
+          <h1 className="text-gray-600 text-sm">
+            {lastMsgPerson} {chat?.lastMessage?.text}
+          </h1>
+          <h1 className="text-gray-500 text-sm">
+            {getDateInRegualarFormat(chat?.lastMessage?.createdAt)}
+          </h1>
+          <div
+            style={{
+              position: "absolute",
+              borderRadius: "50%",
+              backgroundColor: "red",
+              top: "-9px",
+              right: "-9px",
+              width: "24px",
+              height: " 24px",
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+              color: "wheat",
+              fontSize: "12px",
+            }}
+          >
+            {chat.unreadMessages}
+          </div>
+        </div>
+      );
+    }
+  };
+
   const getUserToShowOnLeftPanel = (otherUsers) => {
     return otherUsers?.filter(
       (userObj) =>
@@ -81,8 +142,6 @@ function UsersList({ searchKey, setSearchKey, setMessages }) {
   };
 
   const openNewChatWindowForSelectedUser = async (userObj) => {
-
-  
     const currentChat = { ...userObj };
     currentChat.members = [userObj, user?._id];
     currentChat.unreadMessages = 0;
@@ -103,17 +162,19 @@ function UsersList({ searchKey, setSearchKey, setMessages }) {
           <React.Fragment key={userObj?.name + index}>
             <div
               onClick={() => {
-                  if (userObj?._id === selectedUserId) {
-                    return;
-                  }
+                if (userObj?._id === selectedUserId) {
+                  return;
+                }
                 setSelectedUserId(userObj?._id);
-                openNewChatWindowForSelectedUser(userObj)
-              
+                openNewChatWindowForSelectedUser(userObj);
               }}
               className="flex flex-col gap-3 mt-5"
-              style={{ boxShadow : userObj?._id === selectedUserId ? "2px 2px 2px grey": ""}}
+              style={{
+                boxShadow:
+                  userObj?._id === selectedUserId ? "2px 2px 2px grey" : "",
+                position: "relative",
+              }}
             >
-              {" "}
               <div
                 style={{
                   padding: "7px",
@@ -137,6 +198,7 @@ function UsersList({ searchKey, setSearchKey, setMessages }) {
                     </h1>
                   </div>
                 )}
+
                 <div className="flex flex-col gap-">
                   <div className="flex gap-1">
                     <div className="relative flex gap-1 items-center ">
@@ -148,7 +210,9 @@ function UsersList({ searchKey, setSearchKey, setMessages }) {
                       />
                     </div>
                   </div>
+                  {getLastMsg(userObj)}
                 </div>
+
                 {!chats.filter((chat) =>
                   chat?.members.map((m) => m?._id)?.includes(userObj?._id)
                 ).length > 0 && (

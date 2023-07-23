@@ -6,6 +6,7 @@ import Login from "./Pages/Login";
 import Register from "./Pages/Register";
 import ProtectedRoute from "./Components/ProtectedRoute";
 import store from "../src/Redux/Store";
+import "./App.css"
 
 function App() {
   return (
